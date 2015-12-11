@@ -1,12 +1,6 @@
-.. two dots create a comment. please leave this logo at the top of each of your rst files.
-.. image:: ../etc/opnfv-logo.png
-  :height: 40
-  :width: 200
-  :alt: OPNFV
-  :align: left
-.. these two pipes are to seperate the logo from the first title
-|
-|
+.. This work is licensed under a Creative Commons Attribution 4.0 International License.
+.. http://creativecommons.org/licenses/by/4.0
+
 =============================
 Multisite configuration guide
 =============================
@@ -114,7 +108,3 @@ admin-user-guide.
    .. code-block:: bash
 
       region_name = RegionOne
-
-Revision: _sha1_
-
-Build date: |today|
