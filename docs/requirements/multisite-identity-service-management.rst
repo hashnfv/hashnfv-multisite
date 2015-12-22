@@ -45,8 +45,8 @@ be a topic out of our scope.
 
 - Role assignment: In case of federation(and perhaps other solutions) it is not
   feasible/scalable to do role assignment to users. Role assignment to groups
-is better. Role assignment will be done usually based on group. KeyStone
-supports this.
+  is better. Role assignment will be done usually based on group. KeyStone
+  supports this.
 
 - Amount of inter region traffic: should be kept as little as possible,
   consider CERNs Ceilometer issue as described in
@@ -129,7 +129,7 @@ Database deployment:
     Database replication:
     -Master/slave asynchronous: supported by the database server itself
 (mysql/mariadb etc), works over WAN, it's more scalable
-    -Multi master synchronous: Galera(others like percona), not so scalable, 
+    -Multi master synchronous: Galera(others like percona), not so scalable,
 for multi-master writing, and need more parameter tunning for WAN latency.
     -Symmetrical/asymmetrical: data replicated to all regions or a subset,
 in the latter case it means some regions needs to access Keystone in another
