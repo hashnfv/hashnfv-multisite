@@ -1,9 +1,13 @@
 #!/bin/bash
 
+set -o xtrace
+set -o nounset
+set -o pipefail
+
 INSTALLER_IP=10.20.0.2
 
 usage() {
-	echo "usage: $0 -a <installer_ip>" >&2
+    echo "usage: $0 -a <installer_ip>" >&2
 
 }
 
@@ -42,7 +46,10 @@ sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
 sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
 "ssh $ssh_options ${controller_ip} \"cd /root/ && chmod +x install_kingbird.sh\"" &> /dev/null
 sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
-"ssh $ssh_options ${controller_ip} \"cd /root/ && nohup /root/install_kingbird.sh \"" &> /dev/null
+"ssh $ssh_options ${controller_ip} \"cd /root/ && nohup /root/install_kingbird.sh > install.log 2> /dev/null\"" &> /dev/null
+# Output here
+sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
+"ssh $ssh_options ${controller_ip} \"cd /root/ && cat install.log\""
 
 engine_pid=$(sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} "ssh $ssh_options ${controller_ip} \"pgrep kingbird-engine || echo dead\"") &> /dev/null
 api_pid=$(sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} "ssh $ssh_options ${controller_ip} \"pgrep kingbird-api || echo dead\"") &> /dev/null
