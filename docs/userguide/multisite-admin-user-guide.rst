@@ -211,6 +211,7 @@ Cons:
   * Need to be aware of the chanllenge of key distribution and rotation
     for Fernet token.
 
+Note: PKI token will be deprecated soon, so Fernet token is encouraged.
 
 Multisite VNF Geo site disaster recovery
 ========================================
@@ -262,14 +263,10 @@ The disater recovery process will work like this:
   2) DR software boot VMs from bootable volumes from the remote Cinder in
      the backup site and attach the regarding data volumes.
 
-Note: It’s up to the DR policy and VNF character how to use the API. Some
-VNF may allow the standby of the VNF or member of the cluster to do
-quiece/unquiece to avoid interfering the service provided by the VNF. Some
-other VNF may afford short unavailable for DR purpose.
-
-This option provides application level consistency disaster recovery.
-This feature is WIP in OpenStack Mitaka release, and will be avaialle in next
-OPNFV release.
+Note: Quiesce/Unquiesce spec was approved in Mitaka, but code not get merged in
+time, https://blueprints.launchpad.net/nova/+spec/expose-quiesce-unquiesce-api
+The spec was rejected in Newton when it was reproposed:
+https://review.openstack.org/#/c/295595/. So this option will not work any more.
 
 Option2, Vitrual Machine Snapshot
 ---------------------------------
@@ -321,8 +318,7 @@ Cons:
   * "Standard" support in Openstack for Disaster Recovery currently fairly
     limited, though active work in this area.
 
-This feature is in discussion in OpenStack Mitaka release, and hopefully will
-be avaialle in next OPNFV release.
+Note: Volume replication v2.1 support project level replication.
 
 
 VNF high availability across VIM
@@ -373,21 +369,22 @@ plane. There are some interesting/hard requirements on the networking (L2/L3)
 between OpenStack instances, at lease the backup plane across different
 OpenStack instances:
 
-1) Overlay L2 networking or shared L2 provider networks as the backup plane
-   for heartbeat or state replication. Overlay L2 network is preferred, the
-   reason is:
+1) Overlay L2 networking is prefered as the backup plane for heartbeat or state
+   replication, the reason is:
 
    a) Support legacy compatibility: Some telecom app with built-in internal L2
    network, for easy to move these app to virtualized telecom application, it
    would be better to provide L2 network.
 
    b) Support IP overlapping: multiple telecom applications may have
-      overlapping IP address for cross OpenStack instance networking Therefore,
-      over L2 networking across Neutron feature is required in OpenStack.
+   overlapping IP address for cross OpenStack instance networking.
+   Therefore over L2 networking across Neutron feature is required
+   in OpenStack.
 
 2) L3 networking cross OpenStack instance for heartbeat or state replication.
-   For L3 networking, we can leverage the floating IP provided in current
-   Neutron, so no new feature requirement to OpenStack.
+   Can leverage FIP or vRouter inter-connected with overlay L2 network to
+   establish overlay L3 networking.
 
-Overlay L2 networking across OpenStack instances is in discussion with Neutron
-community.
+Note: L2 border gateway spec was merged in L2GW project:
+https://review.openstack.org/#/c/270786/. Code will be availabe in later
+release.

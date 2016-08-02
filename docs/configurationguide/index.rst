@@ -9,4 +9,4 @@ Multisite Configuration Guide
    :numbered:
    :maxdepth: 2
 
-   multisite-configuration-guide.rst
+   multisite.kingbird.configuration.description.rst

@@ -11,7 +11,7 @@ Multisite identity service management
 Goal
 ----
 
-a user should, using a single authentication point be able to manage virtual
+A user should, using a single authentication point be able to manage virtual
 resources spread over multiple OpenStack regions.
 
 Before you read

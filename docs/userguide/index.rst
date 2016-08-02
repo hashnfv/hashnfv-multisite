@@ -10,3 +10,4 @@ Multisite Admin User Guide
    :maxdepth: 4
 
    multisite-admin-user-guide.rst
+   multisite.kingbird.user.guide.rst
