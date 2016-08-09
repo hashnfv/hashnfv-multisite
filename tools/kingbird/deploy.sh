@@ -51,8 +51,10 @@ sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
 sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
 "ssh $ssh_options ${controller_ip} \"cd /root/ && cat install.log\""
 
-engine_pid=$(sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} "ssh $ssh_options ${controller_ip} \"pgrep kingbird-engine || echo dead\"") &> /dev/null
-api_pid=$(sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} "ssh $ssh_options ${controller_ip} \"pgrep kingbird-api || echo dead\"") &> /dev/null
+sleep 5
+
+engine_pid=$(sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} "ssh $ssh_options ${controller_ip} \"pgrep -f kingbird-engine || echo dead\"") &> /dev/null
+api_pid=$(sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} "ssh $ssh_options ${controller_ip} \"pgrep -f kingbird-api || echo dead\"") &> /dev/null
 
 if [ "$engine_pid" ==  "dead" ]; then
    error "Kingbird engine is not running."
@@ -61,3 +63,5 @@ fi
 if [ "$api_pid" == "dead" ]; then
    error "Kingbird API is not running."
 fi
+
+echo "Deployment complete!"
