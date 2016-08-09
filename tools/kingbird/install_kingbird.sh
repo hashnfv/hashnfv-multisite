@@ -113,6 +113,9 @@ else
         --region ${OS_REGION_NAME}
 fi
 
+# Cleanup the folder before making a fresh clone
+rm -rf kingbird/
+
 #Setup Kingbird
 git clone https://github.com/openstack/kingbird.git && cd kingbird/
 
@@ -121,10 +124,6 @@ pip install --force-reinstall -U .
 
 mkdir -p /etc/kingbird/
 oslo-config-generator --config-file tools/config-generator.conf --output-file ${KINGBIRD_CONF_FILE}
-
-# Delete previous repo clone
-cd ..
-rm -rf kingbird/
 
 # Configure host section
 iniset ${KINGBIRD_CONF_FILE} DEFAULT bind_host ${bind_host}
