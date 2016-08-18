@@ -118,6 +118,7 @@ rm -rf kingbird/
 
 #Setup Kingbird
 git clone https://github.com/openstack/kingbird.git && cd kingbird/
+git checkout tags/0.2.1 -b colorado
 
 pip install -r requirements.txt
 pip install --force-reinstall -U .
