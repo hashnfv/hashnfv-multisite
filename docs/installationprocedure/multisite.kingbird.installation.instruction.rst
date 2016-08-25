@@ -3,8 +3,15 @@
 .. (c) OPNFV
 
 ===========================================
-Multisite.Kingbird installation instruction
+Multisite Kingbird installation instruction
 ===========================================
+
+Abstract
+--------
+This document will give the user instructions on how to deploy
+available scenarios verified for the Colorado release of OPNFV
+platform.
+
 
 Preparing the installation
 --------------------------
