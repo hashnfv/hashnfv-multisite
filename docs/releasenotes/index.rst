@@ -1,12 +1,12 @@
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
 .. http://creativecommons.org/licenses/by/4.0
 
-*****************************
-Multisite Configuration Guide
-*****************************
+**************************
+Multisite Release Notes
+**************************
 
 .. toctree::
    :numbered:
-   :maxdepth: 2
+   :maxdepth: 4
 
-   multisite.kingbird.configuration.description.rst
+   multisite.release.notes.rst
