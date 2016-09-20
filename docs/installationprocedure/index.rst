@@ -13,6 +13,7 @@ Colorado 1.0
    :maxdepth: 2
 
    abstract.rst
-   multisite.kingbird.installation.instruction.rst
-   scenario.release.notes.rst
+   multisite.kingbird.installation.rst
+   multisite.configuration.rst
+   multisite.kingbird.configuration.rst
 

@@ -9,5 +9,5 @@ Multisite Admin User Guide
    :numbered:
    :maxdepth: 4
 
-   multisite-admin-user-guide.rst
-   multisite.kingbird.user.guide.rst
+   multisite.admin.usage.rst
+   multisite.kingbird.usage.rst

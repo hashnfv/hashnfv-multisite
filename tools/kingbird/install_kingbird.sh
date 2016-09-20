@@ -89,6 +89,8 @@ mysql -uroot -e "DROP DATABASE IF EXISTS $mysql_db;"
 mysql -uroot -e "CREATE DATABASE $mysql_db CHARACTER SET utf8;"
 mysql -uroot -e "GRANT ALL PRIVILEGES ON $mysql_db.* TO '$mysql_user'@'$mysql_host' IDENTIFIED BY '$mysql_pass';"
 
+set +e
+
 #Configure kingbird user
 openstack user show kingbird 2>/dev/null
 if [ $? -eq 0 ]; then
@@ -112,6 +114,8 @@ else
         --internalurl http://${KINGBIRD_INTERNAL_URL}:${KINGBIRD_PORT}/${KINGBIRD_VERSION} \
         --region ${OS_REGION_NAME}
 fi
+
+set -e
 
 # Cleanup the folder before making a fresh clone
 rm -rf kingbird/
