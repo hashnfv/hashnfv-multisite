@@ -85,7 +85,6 @@ Quota Management API
    curl \
    -H "Content-Type: application/json" \
    -H "X-Auth-Token: $kb_token" \
-   -H  "ROLE: dmin" \
    -X PUT \
    -d '{"quota_set":{"cores": 10,"ram": 51200, "metadata_items": 100,"key_pairs": 100, "network":20,"security_group": 20,"security_group_rule": 20}}' \
    http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-sets/$tenant_id
@@ -95,7 +94,6 @@ Quota Management API
    curl \
    -H "Content-Type: application/json" \
    -H "X-Auth-Token: $kb_token" \
-   -H  "X_ROLE: admin" \
    http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-sets/$tenant_id
 
 3. A tenant can also get the global limit by himself
@@ -110,7 +108,6 @@ Quota Management API
    curl \
    -H "Content-Type: application/json" \
    -H "X-Auth-Token: $kb_token" \
-   -H  "X_ROLE: admin" \
    http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-sets/defaults
 
 5. Get total usage for a tenant
@@ -118,7 +115,6 @@ Quota Management API
    curl \
    -H "Content-Type: application/json" \
    -H "X-Auth-Token: $kb_token" \
-   -H  "X_ROLE: admin" \
    -X GET \
    http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-sets/$tenant_id/detail
 
@@ -135,7 +131,6 @@ Quota Management API
    curl \
    -H "Content-Type: application/json" \
    -H "X-Auth-Token: $kb_token" \
-   -H  "X_ROLE: admin" \
    -X PUT \
    http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-sets/$tenant_id/sync
 
@@ -145,7 +140,6 @@ Quota Management API
    curl \
    -H "Content-Type: application/json" \
    -H "X-Auth-Token: $kb_token" \
-   -H  "X_ROLE: admin" \
    -X DELETE \
    -d '{"quota_set": [ "cores", "ram"]}' \
    http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-sets/$tenant_id
@@ -155,7 +149,6 @@ Quota Management API
   curl \
   -H "Content-Type: application/json" \
   -H "X-Auth-Token: $kb_token" \
-  -H  "X_ROLE: admin" \
   -X DELETE \
   http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-sets/$tenant_id
 
@@ -168,7 +161,6 @@ Quota Class API
    curl \
    -H "Content-Type: application/json" \
    -H "X-Auth-Token: $kb_token" \
-   -H  "ROLE: dmin" \
    -X PUT \
    -d '{"quota_class_set":{"cores": 100, "network":50,"security_group": 50,"security_group_rule": 50}}' \
    http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-class-sets/default
@@ -178,7 +170,6 @@ Quota Class API
    curl \
    -H "Content-Type: application/json" \
    -H "X-Auth-Token: $kb_token" \
-   -H  "X_ROLE: admin" \
    http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-class-sets/default
 
 3. Delete default quota class
@@ -186,7 +177,6 @@ Quota Class API
    curl \
    -H "Content-Type: application/json" \
    -H "X-Auth-Token: $kb_token" \
-   -H  "ROLE: dmin" \
    -X DELETE \
    http://$kb_ip_addr:8118/v1.0/$admin_tenant_id/os-quota-class-sets/default
 

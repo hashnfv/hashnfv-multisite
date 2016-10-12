@@ -297,7 +297,7 @@ $admin_project_id to the admin project id in your environment:
 .. code-block:: bash
 
     curl  -H "Content-Type: application/json"  -H "X-Auth-Token: $token" \
-    -H  "X_ROLE: admin"  -X PUT \
+    -X PUT \
     http://127.0.0.1:8118/v1.0/$admin_project_id/os-quota-sets/$admin_project_id/sync
 
 If the response looks like following: "triggered quota sync for
