@@ -12,8 +12,6 @@
 # Fetch service password from the configuration files and store them
 # in a file to pass further down the build chain
 
-EXPORT_FILE="/root/servicepass.ini"
-
 GLANCE_CONF="/etc/glance/glance-registry.conf"
 NOVA_CONF="/etc/nova/nova.conf"
 NEUTRON_CONF="/etc/neutron/neutron.conf"
@@ -25,6 +23,11 @@ CEILOMETER_CONF='/etc/ceilometer/ceilometer.conf'
 AODH_CONF='/etc/aodh/aodh.conf'
 
 source openrc
+
+# if running as part of Jenkins job, create the files in WORKSPACE
+WORKSPACE=${WORKSPACE:-/root}
+PASSWORD_FILE_ENC="${WORKSPACE}/servicepass.ini"
+PASSWORD_FILE="${WORKSPACE}/passwords.ini"
 
 # Get an option from an INI file
 # iniget config-file section option
@@ -54,7 +57,7 @@ ceilometer_password=$(iniget ${CEILOMETER_CONF} keystone_authtoken password)
 aodh_password=$(iniget ${AODH_CONF} keystone_authtoken password)
 #NOTE: can't find swift in /etc
 
-cat <<EOT >> /root/passwords.ini
+cat <<EOT >> ${PASSWORD_FILE}
 [DEFAULT]
 identity_uri=${bind_host}
 glance=${glance_password}
@@ -67,6 +70,6 @@ ceilometer=${ceilometer_password}
 aodh=${aodh_password}
 EOT
 
-openssl enc -aes-256-cbc -salt -in /root/passwords.ini -out ${EXPORT_FILE} -k multisite
+openssl enc -aes-256-cbc -salt -in ${PASSWORD_FILE} -out ${PASSWORD_FILE_ENC} -k multisite
 
-rm /root/passwords.ini
+rm ${PASSWORD_FILE}

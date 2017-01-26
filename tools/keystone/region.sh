@@ -27,7 +27,9 @@ source openrc
 #
 # openstack endpoint create --publicurl "" --adminurl "" --internalurl "" --region ${region} <service>
 
-ENDPOINT_FILE="/root/endpoints.ini"
+# if running as part of Jenkins job, read the file from WORKSPACE
+WORKSPACE=${WORKSPACE:-/root}
+ENDPOINT_FILE="${WORKSPACE}/endpoints.ini"
 
 # Get an option from an INI file
 # iniget config-file section option

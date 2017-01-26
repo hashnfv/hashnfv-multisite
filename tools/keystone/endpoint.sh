@@ -16,12 +16,16 @@ set -o pipefail
 # Ensure that openrc containing OpenStack environment variables is present.
 source openrc
 
+# if running as part of Jenkins job, create the file in WORKSPACE
+WORKSPACE=${WORKSPACE:-/root}
+ENDPOINT_FILE="${WORKSPACE}/endpoints.ini"
+
 # Endpoints. Dynamically get IP addresses from another service (keystone)
 ENDPOINT_PUBLIC_URL=$(openstack endpoint list | grep keystone | grep public | cut -d '|' -f 8 | cut -d '/' -f 3 | cut -d ':' -f 1)
 ENDPOINT_ADMIN_URL=$(openstack endpoint list | grep keystone | grep admin | cut -d '|' -f 8 | cut -d '/' -f 3 | cut -d ':' -f 1)
 ENDPOINT_INTERNAL_URL=$(openstack endpoint list | grep keystone | grep internal | cut -d '|' -f 8 | cut -d '/' -f 3 | cut -d ':' -f 1)
 
-cat <<EOT >> /root/endpoints.ini
+cat <<EOT >> ${ENDPOINT_FILE}
 [DEFAULT]
 public_url=${ENDPOINT_PUBLIC_URL}
 admin_url=${ENDPOINT_ADMIN_URL}

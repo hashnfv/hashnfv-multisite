@@ -13,8 +13,10 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-PASSWORD_FILE_ENC="servicepass.ini"
-PASSWORD_FILE="/root/passwords.ini"
+# if running as part of Jenkins job, read and create the files from/in WORKSPACE
+WORKSPACE=${WORKSPACE:-/root}
+PASSWORD_FILE_ENC="${WORKSPACE}/servicepass.ini"
+PASSWORD_FILE="${WORKSPACE}/passwords.ini"
 
 function ini_has_option {
     local file=$1
@@ -67,7 +69,7 @@ $option = $value
 }
 
 function decode_passwords() {
-    openssl enc -aes-256-cbc -d -a -in ${PASSWORD_FILE_ENC} -out /root/passwords.ini -k multisite
+    openssl enc -aes-256-cbc -d -a -in ${PASSWORD_FILE_ENC} -out ${PASSWORD_FILE} -k multisite
 }
 
 function write_controller() {
