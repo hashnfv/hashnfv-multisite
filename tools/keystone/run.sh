@@ -18,9 +18,12 @@ set -o pipefail
 # Usage: run.sh (controller|compute) <runnable_script.sh>
 
 INSTALLER_IP=10.20.0.2
+# Runs on the jumphost
+# if running as part of Jenkins job, read and create the files from/in WORKSPACE
+WORKSPACE=${WORKSPACE:-/root}
 
 usage() {
-    echo "usage: $0 -a <installer_ip> -t (controller|compute) -r <runnable_script.sh> -d <data_file>" >&2
+    echo "usage: $0 -a <installer_ip> -t (controller|compute) -r <runnable_script.sh> -d <data_file> -o <output_file>" >&2
 }
 
 error () {
@@ -51,6 +54,10 @@ case $1 in
     data="$2"
     shift # past argument
     ;;
+    -o|--output)
+    output="$2"
+    shift # past argument
+    ;;
     *)
     echo "Non-option argument: '-${OPTARG}'" >&2
     usage
@@ -61,6 +68,7 @@ shift # past argument or value
 
 installer_ip=${installer_ip:-$INSTALLER_IP}
 data=${data:-""}
+output=${output:-""}
 
 ssh_options="-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no"
 
@@ -77,10 +85,16 @@ function run_on_target() {
     sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
     "ssh $ssh_options $1 \"cd /root/ && chmod +x ${runnable}\"" &> /dev/null
     sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
-    "ssh $ssh_options $1 \"cd /root/ && nohup /root/${runnable} > install.log 2> /dev/null\"" &> /dev/null
+    "ssh $ssh_options $1 \"cd /root/ && nohup /root/${runnable} > ${runnable}.log 2> /dev/null\"" &> /dev/null
     # Output here
     sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
-    "ssh $ssh_options $1 \"cd /root/ && cat install.log\""
+    "ssh $ssh_options $1 \"cd /root/ && cat ${runnable}.log\""
+
+    if [ -n "${output}" ]; then
+        #Fetch output file
+        sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
+        "ssh $ssh_options $1 \"cd /root/ && cat ${output}\"" > "${WORKSPACE}/${output}"
+    fi
 }
 
 target_info=$(sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \

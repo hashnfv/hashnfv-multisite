@@ -13,10 +13,8 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-# if running as part of Jenkins job, read and create the files from/in WORKSPACE
-WORKSPACE=${WORKSPACE:-/root}
-PASSWORD_FILE_ENC="${WORKSPACE}/servicepass.ini"
-PASSWORD_FILE="${WORKSPACE}/passwords.ini"
+PASSWORD_FILE_ENC="/root/servicepass.ini"
+PASSWORD_FILE="/root/passwords.ini"
 
 function ini_has_option {
     local file=$1

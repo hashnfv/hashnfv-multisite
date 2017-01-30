@@ -24,10 +24,9 @@ AODH_CONF='/etc/aodh/aodh.conf'
 
 source openrc
 
-# if running as part of Jenkins job, create the files in WORKSPACE
-WORKSPACE=${WORKSPACE:-/root}
-PASSWORD_FILE_ENC="${WORKSPACE}/servicepass.ini"
-PASSWORD_FILE="${WORKSPACE}/passwords.ini"
+# Always executed on controller
+PASSWORD_FILE_ENC="/root/servicepass.ini"
+PASSWORD_FILE="/root/passwords.ini"
 
 # Get an option from an INI file
 # iniget config-file section option
