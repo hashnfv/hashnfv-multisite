@@ -20,7 +20,7 @@ set -o pipefail
 INSTALLER_IP=10.20.0.2
 # Runs on the jumphost
 # if running as part of Jenkins job, read and create the files from/in WORKSPACE
-WORKSPACE=${WORKSPACE:-/root}
+WORKSPACE=${WORKSPACE:-"/root"}
 
 usage() {
     echo "usage: $0 -a <installer_ip> -t (controller|compute) -r <runnable_script.sh> -d <data_file> -o <output_file>" >&2
@@ -65,6 +65,7 @@ case $1 in
     ;;
 esac
 shift # past argument or value
+done
 
 installer_ip=${installer_ip:-$INSTALLER_IP}
 data=${data:-""}
@@ -95,6 +96,7 @@ function run_on_target() {
         sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
         "ssh $ssh_options $1 \"cd /root/ && cat ${output}\"" > "${WORKSPACE}/${output}"
     fi
+    
 }
 
 target_info=$(sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
