@@ -86,7 +86,7 @@ function run_on_target() {
     sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
     "ssh $ssh_options $1 \"cd /root/ && chmod +x ${runnable}\"" &> /dev/null
     sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
-    "ssh $ssh_options $1 \"cd /root/ && nohup ${runnable} > ${runnable}.log 2> /dev/null\"" &> /dev/null
+    "ssh $ssh_options $1 \"cd /root/ && ./${runnable} > ${runnable}.log 2> /dev/null\"" &> /dev/null
     # Output here
     sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
     "ssh $ssh_options $1 \"cd /root/ && cat ${runnable}.log\""
