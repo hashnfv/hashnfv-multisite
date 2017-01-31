@@ -67,7 +67,7 @@ $option = $value
 }
 
 function decode_passwords() {
-    openssl enc -aes-256-cbc -d -a -in ${PASSWORD_FILE_ENC} -out ${PASSWORD_FILE} -k multisite
+    openssl enc -aes-256-cbc -d -in ${PASSWORD_FILE_ENC} -out ${PASSWORD_FILE} -k multisite
 }
 
 function write_controller() {
