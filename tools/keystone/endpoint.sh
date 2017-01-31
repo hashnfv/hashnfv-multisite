@@ -24,7 +24,7 @@ ENDPOINT_PUBLIC_URL=$(openstack endpoint list | grep keystone | grep public | cu
 ENDPOINT_ADMIN_URL=$(openstack endpoint list | grep keystone | grep admin | cut -d '|' -f 8 | cut -d '/' -f 3 | cut -d ':' -f 1)
 ENDPOINT_INTERNAL_URL=$(openstack endpoint list | grep keystone | grep internal | cut -d '|' -f 8 | cut -d '/' -f 3 | cut -d ':' -f 1)
 
-cat <<EOT >> ${ENDPOINT_FILE}
+cat > ${ENDPOINT_FILE} <<EOT
 [DEFAULT]
 public_url=${ENDPOINT_PUBLIC_URL}
 admin_url=${ENDPOINT_ADMIN_URL}

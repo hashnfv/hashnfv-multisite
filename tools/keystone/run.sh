@@ -79,8 +79,9 @@ function run_on_target() {
     "ssh $ssh_options $1 \"cd /root/  && cat > ${runnable}\"" < ${runnable} &> /dev/null
     if [ -n "${data}" ]; then
         # Copy any accompanying data along with the script
+        fname=$(basename ${data})
         sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
-        "ssh $ssh_options $1 \"cd /root/  && cat > $(basename ${data})\"" < ${data} &> /dev/null
+        "ssh $ssh_options $1 \"cd /root/  && cat > ${fname}\"" < ${data} &> /dev/null
     fi
     # Set the rights and execute
     sshpass -p r00tme ssh 2>/dev/null $ssh_options root@${installer_ip} \
