@@ -72,16 +72,16 @@ function decode_passwords() {
 
 function write_controller() {
     # For each slave region the following files must be updated on each controller.
-    iniset "/etc/glance/glance-registry.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT glance_password)
-    iniset "/etc/glance/glance-api.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT glance_password)
-    iniset "/etc/glance/glance-glare.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT glare_password)
-    iniset "/etc/heat/heat.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT heat_password)
-    iniset "/etc/nova/nova.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT nova_password)
-    iniset "/etc/nova/nova.conf" neutron password $(iniget ${PASSWORD_FILE} DEFAULT neutron_password)
-    iniset "/etc/cinder/cinder.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT cinder_password)
-    iniset "/etc/neutron/neutron.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT neutron_password)
-    iniset "/etc/ceilometer/ceilometer.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT ceilometer_password)
-    iniset "/etc/aodh/aodh.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT aodh_password)
+    iniset "/etc/glance/glance-registry.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT glance)
+    iniset "/etc/glance/glance-api.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT glance)
+    iniset "/etc/glance/glance-glare.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT glare)
+    iniset "/etc/heat/heat.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT heat)
+    iniset "/etc/nova/nova.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT nova)
+    iniset "/etc/nova/nova.conf" neutron password $(iniget ${PASSWORD_FILE} DEFAULT neutron)
+    iniset "/etc/cinder/cinder.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT cinder)
+    iniset "/etc/neutron/neutron.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT neutron)
+    iniset "/etc/ceilometer/ceilometer.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT ceilometer)
+    iniset "/etc/aodh/aodh.conf" keystone_authtoken password $(iniget ${PASSWORD_FILE} DEFAULT aodh)
 }
 
 function restart_controller() {
@@ -109,7 +109,7 @@ function restart_controller() {
 }
 
 function write_compute() {
-    iniset "/etc/nova/nova.conf" neutron password $(iniget ${PASSWORD_FILE} DEFAULT neutron_password)
+    iniset "/etc/nova/nova.conf" neutron password $(iniget ${PASSWORD_FILE} DEFAULT neutron)
 }
 
 function restart_compute() {
