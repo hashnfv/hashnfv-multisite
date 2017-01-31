@@ -29,5 +29,5 @@ cat > ${ENDPOINT_FILE} <<EOT
 public_url=${ENDPOINT_PUBLIC_URL}
 admin_url=${ENDPOINT_ADMIN_URL}
 private_url=${ENDPOINT_INTERNAL_URL}
-os_region="RegionTwo"
+os_region=RegionTwo
 EOT
