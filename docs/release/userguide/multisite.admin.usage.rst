@@ -1,10 +1,6 @@
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
 .. http://creativecommons.org/licenses/by/4.0
 
-==========================
-Multisite admin user guide
-==========================
-
 Multisite identity service management
 =====================================
 
@@ -19,14 +15,16 @@ Token Format
 
 There are 3 types of token format supported by OpenStack KeyStone
 
+  * **FERNET**
   * **UUID**
   * **PKI/PKIZ**
-  * **FERNET**
 
 It's very important to understand these token format before we begin the
 mutltisite identity service management. Please refer to the OpenStack
 official site for the identity management.
 http://docs.openstack.org/admin-guide-cloud/identity_management.html
+
+Please note that PKI/PKIZ token format has been deprecated.
 
 Key consideration in multisite scenario
 ---------------------------------------
@@ -53,6 +51,13 @@ region as the service itself.
 The challenge to distribute KeyStone service into each region is the KeyStone
 backend. Different token format has different data persisted in the backend.
 
+* Fernet: Tokens are non persistent cryptographic based tokens and validated
+  online by the Keystone service. Fernet tokens are more lightweight
+  than PKI tokens and have a fixed size. Fernet tokens require Keystone
+  deployed in a distributed manner, again to avoid inter region traffic. The
+  data synchronization cost for the Keystone backend is smaller due to the non-
+  persisted token.
+
 * UUID: UUID tokens have a fixed size. Tokens are persistently stored and
   create a lot of database traffic, the persistence of token is for the revoke
   purpose. UUID tokens are validated online by Keystone, call to service will
@@ -60,25 +65,6 @@ backend. Different token format has different data persisted in the backend.
   bottleneck in a large system. Due to this, UUID token type is not suitable
   for use in multi region clouds, no matter the Keystone database
   replicates or not.
-
-* PKI: Tokens are non persistent cryptographic based tokens and validated
-  offline (not by the Keystone service) by Keystone middleware which is part
-  of other services such as Nova. Since PKI tokens include endpoint for all
-  services in all regions, the token size can become big. There are
-  several ways to reduce the token size such as no catalog policy, endpoint
-  filter to make a project binding with limited endpoints, and compressed PKI
-  token - PKIZ, but the size of token is still unpredictable, making it difficult
-  to manage. If catalog is not applied, that means the user can access all
-  regions, in some scenario, it's not allowed to do like this. Centralized
-  Keystone with PKI token to reduce inter region backend synchronization traffic.
-  PKI tokens do produce Keystone traffic for revocation lists.
-
-* Fernet: Tokens are non persistent cryptographic based tokens and validated
-  online by the Keystone service. Fernet tokens are more lightweight
-  than PKI tokens and have a fixed size. Fernet tokens require Keystone
-  deployed in a distributed manner, again to avoid inter region traffic. The
-  data synchronization cost for the Keystone backend is smaller due to the non-
-  persisted token.
 
 Cryptographic tokens bring new (compared to UUID tokens) issues/use-cases
 like key rotation, certificate revocation. Key management is out of scope for
@@ -110,7 +96,7 @@ Only the Keystone database can be replicated to other sites. Replicating
 databases for other services will cause those services to get of out sync and
 malfunction.
 
-Since only the Keystone database is to be sync or replicated to another
+Since only the Keystone database is to be replicated sync. or async. to another
 region/site, it's better to deploy Keystone database into its own
 database server with extra networking requirement, cluster or replication
 configuration. How to support this by installer is out of scope.
@@ -120,40 +106,6 @@ used, if global transaction identifiers GTID is enabled.
 
 Deployment options
 ------------------
-
-**Distributed KeyStone service with PKI token**
-
-Deploy KeyStone service in two sites with database replication. If site
-level failure impact is not considered, then KeyStone service can only be
-deployed into one site.
-
-The PKI token has one great advantage is that the token validation can be
-done locally, without sending token validation request to KeyStone server.
-The drawback of PKI token is
-the endpoint list size in the token. If a project will be only spread in
-very limited site number(region number), then we can use the endpoint
-filter to reduce the token size, make it workable even a lot of sites
-in the cloud.
-KeyStone middleware(which is co-located in the service like
-Nova-API/xxx-API) will have to send the request to the KeyStone server
-frequently for the revoke-list, in order to reject some malicious API
-request, for example, a user has to be deactivated, but use an old token
-to access OpenStack service.
-
-For this option, needs to leverage database replication to provide
-KeyStone Active-Active mode across sites to reduce the impact of site failure.
-And the revoke-list request is very frequently asked, so the performance of the
-KeyStone server needs also to be taken care.
-
-Site level keystone load balance is required to provide site level
-redundancy, otherwise the KeyStone middleware will not switch request to the
-healthy KeyStone server in time.
-
-And also the cert distribution/revoke to each site / API server for token
-validation is required.
-
-This option can be used for some scenario where there are very limited
-sites, especially if each project only spreads into limited sites ( regions ).
 
 **Distributed KeyStone service with Fernet token**
 
@@ -186,11 +138,13 @@ cover very well.
 
 **Distributed KeyStone service with Fernet token + Async replication (star-mode)**
 
-One master KeyStone cluster with Fernet token in two sites (for site level
-high availability purpose), other sites will be installed with at least 2 slave
-nodes where the node is configured with DB async replication from the master
-cluster members, and one slave’s mater node in site1, another slave’s master
-node in site 2.
+One master KeyStone cluster with Fernet token in one or two sites(for site
+level high availability purpose), other sites will be installed with at least
+2 slave nodes where the node is configured with DB async replication from the
+master cluster members. The async. replication data source is better to be
+from different member of the master cluster, if there are two sites for the
+KeyStone cluster, it'll be better that source members for async. replication
+are located in different site.
 
 Only the master cluster nodes are allowed to write,  other slave nodes
 waiting for replication from the master cluster member( very little delay).
@@ -210,8 +164,6 @@ Pros:
 Cons:
   * Need to be aware of the chanllenge of key distribution and rotation
     for Fernet token.
-
-Note: PKI token will be deprecated soon, so Fernet token is encouraged.
 
 Multisite VNF Geo site disaster recovery
 ========================================
@@ -364,27 +316,50 @@ purpose:
    configuration
 
 Generally these planes are separated with each other. And for legacy telecom
-application, each internal plane will have its fixed or flexible IP addressing
-plane. There are some interesting/hard requirements on the networking (L2/L3)
+application, each internal plane will have its fixed or flexble IP addressing
+plan.
+
+There are some interesting/hard requirements on the networking (L2/L3)
 between OpenStack instances, at lease the backup plane across different
 OpenStack instances:
 
-1) Overlay L2 networking is prefered as the backup plane for heartbeat or state
-   replication, the reason is:
+To make the VNF can work with HA mode across different OpenStack instances in
+one site (but not limited to), need to support at lease the backup plane across
+different OpenStack instances:
 
-   a) Support legacy compatibility: Some telecom app with built-in internal L2
-   network, for easy to move these app to virtualized telecom application, it
-   would be better to provide L2 network.
+1) L2 networking across OpenStack instance for heartbeat or state replication.
+Overlay L2 networking or shared L2 provider networks can work as the backup
+plance for heartbeat or state replication. Overlay L2 network is preferred,
+the reason is:
 
-   b) Support IP overlapping: multiple telecom applications may have
-   overlapping IP address for cross OpenStack instance networking.
-   Therefore over L2 networking across Neutron feature is required
-   in OpenStack.
+   a. Support legacy compatibility: Some telecom app with built-in internal L2
+      network, for easy to move these app to VNF, it would be better to provide
+      L2 network.
+   b. Isolated L2 network will simplify the security management between
+      different network planes.
+   c. Easy to support IP/mac floating across OpenStack.
+   d. Support IP overlapping: multiple VNFs may have overlaping IP address for
+      cross OpenStack instance networking.
 
-2) L3 networking cross OpenStack instance for heartbeat or state replication.
-   Can leverage FIP or vRouter inter-connected with overlay L2 network to
-   establish overlay L3 networking.
+Therefore, over L2 networking across Neutron feature is required in OpenStack.
 
-Note: L2 border gateway spec was merged in L2GW project:
-https://review.openstack.org/#/c/270786/. Code will be availabe in later
-release.
+2) L3 networking across OpenStack instance for heartbeat or state replication.
+For L3 networking, we can leverage the floating IP provided in current
+Neutron, or use VPN or BGPVPN(networking-bgpvpn) to setup the connection.
+
+L3 networking to support the VNF HA will consume more resources and need to
+take more security factors into consideration, this make the networking
+more complex. And L3 networking is also not possible to provide IP floating
+across OpenStack instances.
+
+3) The IP address used for VNF to connect with other VNFs should be able to be
+floating cross OpenStack instance. For example, if the master failed, the IP
+address should be used in the standby which is running in another OpenStack
+instance. There are some method like VRRP/GARP etc can help the movement of the
+external IP, so no new feature will be added to OpenStack.
+
+Several projects are addressing the networking requirements, deployment should
+consider the factors mentioned above.
+  * Tricircle: https://github.com/openstack/tricircle/
+  * Networking-BGPVPN: https://github.com/openstack/networking-bgpvpn/
+  * VPNaaS: https://github.com/openstack/neutron-vpnaas

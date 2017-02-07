@@ -1,9 +1,9 @@
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
 .. http://creativecommons.org/licenses/by/4.0
 
-===========================================
-Multisite Kingbird installation instruction
-===========================================
+=================================
+Kingbird installation instruction
+=================================
 
 Abstract
 --------
@@ -142,6 +142,9 @@ By default, the bind_host of kingbird-api is local_host(127.0.0.1), and the
 port for the service is 8118, you can leave it as the default if no port
 conflict happened.
 
+Please replace the address of Kingbird service "127.0.0.1" which is mentioned
+below to the address you get from OpenStack Kingbird endpoint.
+
 To make the Kingbird work normally, you have to edit these configuration
 items. The [cache] section is used by kingbird engine to access the quota
 information of Nova, Cinder, Neutron in each region, replace the
@@ -229,16 +232,7 @@ bus configuration in Nova, Cinder, Neutron configuration file.
 .. code-block:: bash
 
     [DEFAULT]
-    rpc_backend = rabbit
-    control_exchange = openstack
-    transport_url = None
-
-    [oslo_messaging_rabbit]
-    rabbit_host = 127.0.0.1
-    rabbit_port = 5671
-    rabbit_userid = guest
-    rabbit_password = guest
-    rabbit_virtual_host = /
+    transport_url = rabbit://stackrabbit:password@127.0.0.1:5672/
 
 After these basic configuration items configured, now the database schema of
 "kingbird" should be created:
@@ -253,10 +247,9 @@ according to your cloud planning:
 .. code-block:: bash
 
     openstack service create --name=kingbird synchronization
-    openstack endpoint create --region=RegionOne \
-    --publicurl=http://127.0.0.1:8118/v1.0 \
-    --adminurl=http://127.0.0.1:8118/v1.0 \
-    --internalurl=http://127.0.0.1:8118/v1.0 kingbird
+    openstack endpoint create --region=RegionOne kingbird public http://127.0.0.1:8118/v1.0
+    openstack endpoint create --region=RegionOne kingbird admin http://127.0.0.1:8118/v1.0
+    openstack endpoint create --region=RegionOne kingbird internal http://127.0.0.1:8118/v1.0
 
 Now it's ready to run kingbird-api and kingbird-engine:
 
@@ -277,12 +270,12 @@ Post-installation activities
 ----------------------------
 
 Run the following commands to check whether kingbird-api is serving, please
-replace $token to the token you get from "openstack token issue":
+replace $mytoken to the token you get from "openstack token issue":
 
 .. code-block:: bash
 
     openstack token issue
-    curl  -H "Content-Type: application/json"  -H "X-Auth-Token: $token" \
+    curl  -H "Content-Type: application/json"  -H "X-Auth-Token: $mytoken" \
     http://127.0.0.1:8118/
 
 If the response looks like following: {"versions": [{"status": "CURRENT",
@@ -291,12 +284,12 @@ If the response looks like following: {"versions": [{"status": "CURRENT",
 then that means the kingbird-api is working normally.
 
 Run the following commands to check whether kingbird-engine is serving, please
-replace $token to the token you get from "openstack token issue", and the
+replace $mytoken to the token you get from "openstack token issue", and the
 $admin_project_id to the admin project id in your environment:
 
 .. code-block:: bash
 
-    curl  -H "Content-Type: application/json"  -H "X-Auth-Token: $token" \
+    curl  -H "Content-Type: application/json"  -H "X-Auth-Token: $mytoken" \
     -X PUT \
     http://127.0.0.1:8118/v1.0/$admin_project_id/os-quota-sets/$admin_project_id/sync
 

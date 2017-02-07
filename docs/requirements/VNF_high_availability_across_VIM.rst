@@ -1,21 +1,21 @@
 .. This work is licensed under a Creative Commons Attribution 4.0 International License.
 .. http://creativecommons.org/licenses/by/4.0
 
-=======================================
+================================
 VNF high availability across VIM
-=======================================
+================================
 
 Problem description
 ===================
 
 Abstract
-------------
+--------
 
 a VNF (telecom application) should, be able to realize high availability
 deloyment across OpenStack instances.
 
 Description
-------------
+-----------
 VNF (Telecom application running over cloud) may (already) be designed as
 Active-Standby/Active-Active/N-Way to achieve high availability,
 
@@ -64,7 +64,7 @@ the potential for correlated failure to very low levels (at least as low as the
 required overall application availability).
 
 Analysis of requirements to OpenStack
-===========================
+=====================================
 The VNF often has different networking plane for different purpose:
 
 external network plane: using for communication with other VNF
@@ -76,24 +76,37 @@ between the component's active/standy or active/active or N-way cluster.
 management plane: this plane is mainly for the management purpose
 
 Generally these planes are seperated with each other. And for legacy telecom
-application, each internal plane will have its fixed or flexsible IP addressing
-plane.
+application, each internal plane will have its fixed or flexible IP addressing
+plan.
 
-to make the VNF can work with HA mode across different OpenStack instances in
+To make the VNF can work with HA mode across different OpenStack instances in
 one site (but not limited to), need to support at lease the backup plane across
 different OpenStack instances:
 
-1) Overlay L2 networking or shared L2 provider networks as the backup plance for
-heartbeat or state replication. Overlay L2 network is preferred, the reason is:
-a. Support legacy compatibility: Some telecom app with built-in internal L2
-network, for easy to move these app to VNF, it would be better to provide L2
-network b. Support IP overlapping: multiple VNFs may have overlaping IP address
-for cross OpenStack instance networking
+1) L2 networking across OpenStack instance for heartbeat or state replication.
+Overlay L2 networking or shared L2 provider networks can work as the backup
+plance for heartbeat or state replication. Overlay L2 network is preferred,
+the reason is:
+
+   a. Support legacy compatibility: Some telecom app with built-in internal L2
+      network, for easy to move these app to VNF, it would be better to provide
+      L2 network.
+   b. Isolated L2 network will simplify the security management between
+      different network planes.
+   c. Easy to support IP/mac floating across OpenStack.
+   d. Support IP overlapping: multiple VNFs may have overlaping IP address for
+      cross OpenStack instance networking.
+
 Therefore, over L2 networking across Neutron feature is required in OpenStack.
 
-2) L3 networking cross OpenStack instance for heartbeat or state replication.
-For L3 networking, we can leverage the floating IP provided in current Neutron,
-so no new feature requirement to OpenStack.
+2) L3 networking across OpenStack instance for heartbeat or state replication.
+For L3 networking, we can leverage the floating IP provided in current
+Neutron, or use VPN or BGPVPN(networking-bgpvpn) to setup the connection.
+
+L3 networking to support the VNF HA will consume more resources and need to
+take more security factors into consideration, this make the networking
+more complex. And L3 networking is also not possible to provide IP floating
+across OpenStack instances.
 
 3) The IP address used for VNF to connect with other VNFs should be able to be
 floating cross OpenStack instance. For example, if the master failed, the IP
@@ -103,48 +116,20 @@ external IP, so no new feature will be added to OpenStack.
 
 
 Prototype
------------
+---------
     None.
 
 Proposed solution
------------
-
-    requirements perspective It's up to application descision to use L2 or L3
-networking across Neutron.
-
-    For Neutron, a L2 network is consisted of lots of ports. To make the cross
-Neutron L2 networking is workable, we need some fake remote ports in local
-Neutron to represent VMs in remote site ( remote OpenStack ).
-
-    the fake remote port will reside on some VTEP ( for VxLAN ), the tunneling
-IP address of the VTEP should be the attribute of the fake remote port, so that
-the local port can forward packet to correct tunneling endpoint.
-
-    the idea is to add one more ML2 mechnism driver to capture the fake remote
-port CRUD( creation, retievement, update, delete)
-
-    when a fake remote port is added/update/deleted, then the ML2 mechanism
-driver for these fake ports will activate L2 population, so that the VTEP
-tunneling endpoint information could be understood by other local ports.
-
-    it's also required to be able to query the port's VTEP tunneling endpoint
-information through Neutron API, in order to use these information to create
-fake remote port in another Neutron.
-
-    In the past, the port's VTEP ip address is the host IP where the VM resides.
-But the this BP https://review.openstack.org/#/c/215409/ will make the port free
-of binding to host IP as the tunneling endpoint, you can even specify L2GW ip
-address as the tunneling endpoint.
-
-    Therefore a new BP will be registered to processing the fake remote port, in
-order make cross Neutron L2 networking is feasible. RFE is registered first:
-https://bugs.launchpad.net/neutron/+bug/1484005
-
+-----------------
+Several projects are addressing the networking requirements:
+  * Tricircle: https://github.com/openstack/tricircle/
+  * Networking-BGPVPN: https://github.com/openstack/networking-bgpvpn/
+  * VPNaaS: https://github.com/openstack/neutron-vpnaas
 
 Gaps
 ====
-    1) fake remote port for cross Neutron L2 networking
-
+    Inter-networking among OpenStack clouds for application HA need is lack
+    in Neutron, and covered by sevral new created projects.
 
 **NAME-THE-MODULE issues:**
 
@@ -156,4 +141,3 @@ Affected By
 
 References
 ==========
-

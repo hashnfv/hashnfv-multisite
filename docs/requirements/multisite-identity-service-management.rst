@@ -9,11 +9,11 @@ Glossary
 ========
 
 There are 3 types of token supported by OpenStack KeyStone
+    **FERNET**
+
     **UUID**
 
     **PKI/PKIZ**
-
-    **FERNET**
 
 Please refer to reference section for these token formats, benchmark and
 comparation.
@@ -189,7 +189,7 @@ cover very well.
    multi-cluster mode).
 
     We may have several KeyStone cluster with Fernet token, for example,
-cluster1 ( site1, site2, … site 10 ), cluster 2 ( site11, site 12,..,site 20).
+cluster1(site1, site2, .., site 10), cluster 2(site11, site 12,.., site 20).
 Then do the DB async replication among different cluster asynchronously.
 
     A prototype of this has been down on this. In some blogs they call it
@@ -208,14 +208,16 @@ http://lbragstad.com/?p=156
 -  KeyStone service(Distributed) with Fernet token + Async replication (
    star-mode).
 
-    one master KeyStone cluster with Fernet token in two sites (for site level
-high availability purpose), other sites will be installed with at least 2 slave
-nodes where the node is configured with DB async replication from the master
-cluster members, and one slave’s mater node in site1, another slave’s master
-node in site 2.
+    one master KeyStone cluster with Fernet token in one or two sites (two
+sites if site level high availability is required), other sites will be
+installed with at least 2 slave nodes where the node is configured with
+DB async replication from the master cluster member. The async. replication
+data source is better to be from different member of the master cluster, if
+there are two sites for the KeyStone cluster, it'll be better that source
+members for async. replication are located in different site.
 
     Only the master cluster nodes are allowed to write,  other slave nodes
-waiting for replication from the master cluster ( very little delay) member.
+waiting for ( very little delay) replication from the master cluster member.
 But  the chanllenge of key distribution and rotation for Fernet token should be
 settled, you can refer to these two blogs: http://lbragstad.com/?p=133,
 http://lbragstad.com/?p=156
@@ -347,6 +349,9 @@ in deployment and maintenance, with better scalability.
 
     Therefore the candidate solution "KeyStone service(Distributed) with Fernet
 token + Async replication ( star-mode)" for multsite OPNFV cloud is
+recommended.
+
+    PKI token has been deprecated, so all proposals about PKI token are not
 recommended.
 
 References
