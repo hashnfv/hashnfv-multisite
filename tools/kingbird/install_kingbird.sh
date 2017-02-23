@@ -116,7 +116,7 @@ if [ $? -eq 0 ]; then
 else
     echo "Creating Kingbird endpoints.."
     openstack service create --name=kingbird --description="Kingbird" multisite
-    
+
     openstack endpoint create kingbird public http://${KINGBIRD_PUBLIC_URL}:${KINGBIRD_PORT}/${KINGBIRD_VERSION} --region ${OS_REGION_NAME}
     openstack endpoint create kingbird admin http://${KINGBIRD_ADMIN_URL}:${KINGBIRD_PORT}/${KINGBIRD_VERSION} --region ${OS_REGION_NAME}
     openstack endpoint create kingbird internal http://${KINGBIRD_INTERNAL_URL}:${KINGBIRD_PORT}/${KINGBIRD_VERSION} --region ${OS_REGION_NAME}
@@ -169,13 +169,10 @@ iniset ${KINGBIRD_CONF_FILE} database connection "mysql://$mysql_user:$mysql_pas
 iniset ${KINGBIRD_CONF_FILE} database max_overflow -1
 iniset ${KINGBIRD_CONF_FILE} database max_pool_size 1000
 
-# Kill kingbird
-if pgrep kingbird-api &> /dev/null ; then  pkill -f kingbird-api ; fi
-if pgrep kingbird-engine &> /dev/null ; then  pkill -f kingbird-engine ; fi
 
 # Run kingbird
 mkdir -p /var/log/kingbird
 kingbird-manage --config-file ${KINGBIRD_CONF_FILE} db_sync
-nohup kingbird-engine --config-file ${KINGBIRD_CONF_FILE} --log-file /var/log/kingbird/kingbird-engine.log &
-nohup kingbird-api --config-file ${KINGBIRD_CONF_FILE} --log-file /var/log/kingbird/kingbird-api.log &
+kingbird-engine --config-file ${KINGBIRD_CONF_FILE} --log-file /var/log/kingbird/kingbird-engine.log &
+kingbird-api --config-file ${KINGBIRD_CONF_FILE} --log-file /var/log/kingbird/kingbird-api.log &
 
