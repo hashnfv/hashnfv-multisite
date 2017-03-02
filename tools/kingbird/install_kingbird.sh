@@ -172,7 +172,7 @@ iniset ${KINGBIRD_CONF_FILE} database max_pool_size 1000
 
 # Run kingbird
 mkdir -p /var/log/kingbird
-kingbird-manage --config-file ${KINGBIRD_CONF_FILE} db_sync
-kingbird-engine --config-file ${KINGBIRD_CONF_FILE} --log-file /var/log/kingbird/kingbird-engine.log &
-kingbird-api --config-file ${KINGBIRD_CONF_FILE} --log-file /var/log/kingbird/kingbird-api.log &
+nohup /usr/local/bin/kingbird-manage --config-file ${KINGBIRD_CONF_FILE} db_sync
+nohup /usr/local/bin/kingbird-engine --config-file ${KINGBIRD_CONF_FILE} --log-file /var/log/kingbird/kingbird-engine.log &
+nohup /usr/local/bin/kingbird-api --config-file ${KINGBIRD_CONF_FILE} --log-file /var/log/kingbird/kingbird-api.log &
 
