@@ -21,6 +21,7 @@ KINGBIRD_PUBLIC_URL=$(openstack endpoint list | grep keystone | grep public | cu
 KINGBIRD_ADMIN_URL=$(openstack endpoint list | grep keystone | grep admin | cut -d '|' -f 8 | cut -d '/' -f 3 | cut -d ':' -f 1)
 KINGBIRD_INTERNAL_URL=$(openstack endpoint list | grep keystone | grep internal | cut -d '|' -f 8 | cut -d '/' -f 3 | cut -d ':' -f 1)
 KINGBIRD_PORT=8118
+KINGBIRD_CONF_FILE=/etc/kingbird/kingbird.conf
 KINGBIRD_VERSION='v1.0'
 # MySQL
 mysql_host=$(mysql -uroot -se "SELECT SUBSTRING_INDEX(USER(), '@', -1);")
@@ -34,13 +35,6 @@ admin_user='kingbird'
 admin_tenant_name='services'
 auth_uri=$OS_AUTH_URL"v3"
 
-# Rabbit
-rabbit_user='nova'
-rabbit_password=$(sed -n 's/^rabbit_password *= *\([^ ]*.*\)/\1/p' < /etc/nova/nova.conf)
-rabbit_hosts=$(sed -n 's/^rabbit_hosts *= *\([^ ]*.*\)/\1/p' < /etc/nova/nova.conf)
-
-# Config
-KINGBIRD_CONF_FILE='/etc/kingbird/kingbird.conf'
 bind_host=$(sed -n 's/^admin_bind_host *= *\([^ ]*.*\)/\1/p' < /etc/keystone/keystone.conf)
 
 function ini_has_option {
@@ -72,6 +66,20 @@ $option = $value
         # Replace it
         sed -i -e '/^\['${section}'\]/,/^\[.*\]/ s'${sep}'^\('${option}'[ \t]*=[ \t]*\).*$'${sep}'\1'"${value}"${sep} "$file"
     fi
+}
+
+function iniget {
+    local xtrace
+    xtrace=$(set +o | grep xtrace)
+    set +o xtrace
+    local file=$1
+    local section=$2
+    local option=$3
+    local line
+
+    line=$(sed -ne "/^\[$section\]/,/^\[.*\]/ { /^$option[ \t]*=/ p; }" "$file")
+    echo ${line#*=}
+    $xtrace
 }
 
 export DEBIAN_FRONTEND=noninteractive
@@ -140,6 +148,8 @@ oslo-config-generator --config-file tools/config-generator.conf --output-file ${
 # Configure host section
 iniset ${KINGBIRD_CONF_FILE} DEFAULT bind_host ${bind_host}
 iniset ${KINGBIRD_CONF_FILE} DEFAULT bind_port ${KINGBIRD_PORT}
+iniset ${KINGBIRD_CONF_FILE} DEFAULT transport_url $(iniget /etc/nova/nova.conf DEFAULT transport_url)
+iniset ${KINGBIRD_CONF_FILE} DEFAULT rpc_backend rabbit
 iniset ${KINGBIRD_CONF_FILE} host_details host ${bind_host}
 
 # Configure cache section. Ideally should be removed
@@ -155,14 +165,6 @@ iniset ${KINGBIRD_CONF_FILE} keystone_authtoken admin_user ${admin_user}
 iniset ${KINGBIRD_CONF_FILE} keystone_authtoken admin_password ${admin_password}
 iniset ${KINGBIRD_CONF_FILE} keystone_authtoken auth_uri ${auth_uri}
 iniset ${KINGBIRD_CONF_FILE} keystone_authtoken identity_uri ${OS_AUTH_URL}
-
-# Configure RabbitMQ credentials
-iniset ${KINGBIRD_CONF_FILE} oslo_messaging_rabbit rabbit_userid ${rabbit_user}
-iniset ${KINGBIRD_CONF_FILE} oslo_messaging_rabbit rabbit_password ${rabbit_password}
-iniset ${KINGBIRD_CONF_FILE} oslo_messaging_rabbit rabbit_hosts ${rabbit_hosts}
-iniset ${KINGBIRD_CONF_FILE} oslo_messaging_rabbit rabbit_virtual_host /
-iniset ${KINGBIRD_CONF_FILE} oslo_messaging_rabbit rabbit_ha_queues False
-
 
 # Configure the database.
 iniset ${KINGBIRD_CONF_FILE} database connection "mysql://$mysql_user:$mysql_pass@$mysql_host/$mysql_db?charset=utf8"
