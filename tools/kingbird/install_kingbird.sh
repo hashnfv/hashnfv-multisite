@@ -171,6 +171,26 @@ iniset ${KINGBIRD_CONF_FILE} database connection "mysql://$mysql_user:$mysql_pas
 iniset ${KINGBIRD_CONF_FILE} database max_overflow -1
 iniset ${KINGBIRD_CONF_FILE} database max_pool_size 1000
 
+# Configure haproxy
+
+cat > /etc/haproxy/conf.d/180-kingbird-api.cfg <<EOF
+listen kingbird-api
+  bind 172.16.0.3:8118
+  bind 192.168.0.2:8118
+  http-request  set-header X-Forwarded-Proto https if { ssl_fc }
+  option  httpchk
+  http-check expect status 401
+  option  httplog
+  option  forceclose
+  option  http-buffer-request
+  timeout  server 660s
+  timeout  http-request 10s
+  server node-4 192.168.0.4:8118  check inter 10s fastinter 2s downinter 3s rise 3 fall 3
+EOF
+
+# Configure iptables
+iptables -I INPUT -p tcp -m multiport --dports 8118 -m comment --comment "410 kingbird" -j ACCEPT
+
 
 # Run kingbird
 mkdir -p /var/log/kingbird
