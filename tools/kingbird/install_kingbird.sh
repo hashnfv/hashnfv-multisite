@@ -185,8 +185,10 @@ listen kingbird-api
   option  http-buffer-request
   timeout  server 660s
   timeout  http-request 10s
-  server node-4 192.168.0.4:8118  check inter 10s fastinter 2s downinter 3s rise 3 fall 3
+  server node-4 ${bind_host}:8118  check inter 10s fastinter 2s downinter 3s rise 3 fall 3
 EOF
+
+service haproxy restart
 
 # Configure iptables
 iptables -I INPUT -p tcp -m multiport --dports 8118 -m comment --comment "410 kingbird" -j ACCEPT
