@@ -175,8 +175,8 @@ iniset ${KINGBIRD_CONF_FILE} database max_pool_size 1000
 
 cat > /etc/haproxy/conf.d/180-kingbird-api.cfg <<EOF
 listen kingbird-api
-  bind 172.16.0.3:8118
-  bind 192.168.0.2:8118
+  bind ${KINGBIRD_PUBLIC_URL}:${KINGBIRD_PORT}
+  bind ${KINGBIRD_INTERNAL_URL}:${KINGBIRD_PORT}
   http-request  set-header X-Forwarded-Proto https if { ssl_fc }
   option  httpchk
   http-check expect status 401
@@ -185,7 +185,7 @@ listen kingbird-api
   option  http-buffer-request
   timeout  server 660s
   timeout  http-request 10s
-  server node-4 ${bind_host}:8118  check inter 10s fastinter 2s downinter 3s rise 3 fall 3
+  server node-4 ${bind_host}:${KINGBIRD_PORT}  check inter 10s fastinter 2s downinter 3s rise 3 fall 3
 EOF
 
 service haproxy restart
