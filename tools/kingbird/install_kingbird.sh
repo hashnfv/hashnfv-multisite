@@ -171,6 +171,9 @@ iniset ${KINGBIRD_CONF_FILE} database connection "mysql://$mysql_user:$mysql_pas
 iniset ${KINGBIRD_CONF_FILE} database max_overflow -1
 iniset ${KINGBIRD_CONF_FILE} database max_pool_size 1000
 
+# Configure iptables
+iptables -I INPUT -p tcp -m multiport --dports 8118 -m comment --comment "410 kingbird" -j ACCEPT
+
 # Configure haproxy
 
 cat > /etc/haproxy/conf.d/180-kingbird-api.cfg <<EOF
@@ -189,9 +192,6 @@ listen kingbird-api
 EOF
 
 service haproxy restart
-
-# Configure iptables
-iptables -I INPUT -p tcp -m multiport --dports 8118 -m comment --comment "410 kingbird" -j ACCEPT
 
 
 # Run kingbird
