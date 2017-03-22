@@ -191,7 +191,7 @@ listen kingbird-api
   server node-4 ${bind_host}:${KINGBIRD_PORT}  check inter 10s fastinter 2s downinter 3s rise 3 fall 3
 EOF
 
-service haproxy restart
+crm resource restart p_haproxy
 
 
 # Run kingbird
