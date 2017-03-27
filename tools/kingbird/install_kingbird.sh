@@ -33,7 +33,7 @@ mysql_db='kingbird'
 admin_password='keystone_kb_pass'
 admin_user='kingbird'
 admin_tenant_name='services'
-auth_uri=$OS_AUTH_URL"v3"
+auth_uri=$OS_AUTH_URL
 
 bind_host=$(sed -n 's/^admin_bind_host *= *\([^ ]*.*\)/\1/p' < /etc/keystone/keystone.conf)
 
