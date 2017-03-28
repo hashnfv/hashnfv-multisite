@@ -137,7 +137,7 @@ rm -rf kingbird/
 
 #Setup Kingbird
 git clone https://github.com/openstack/kingbird.git && cd kingbird/
-git checkout tags/0.2.1 -b colorado
+git checkout tags/1.1.0 -b colorado
 
 pip install -r requirements.txt
 pip install --force-reinstall -U .
@@ -165,6 +165,8 @@ iniset ${KINGBIRD_CONF_FILE} keystone_authtoken admin_user ${admin_user}
 iniset ${KINGBIRD_CONF_FILE} keystone_authtoken admin_password ${admin_password}
 iniset ${KINGBIRD_CONF_FILE} keystone_authtoken auth_uri ${auth_uri}
 iniset ${KINGBIRD_CONF_FILE} keystone_authtoken identity_uri ${OS_AUTH_URL}
+iniset ${KINGBIRD_CONF_FILE} keystone_authtoken project_domain_name ${OS_PROJECT_DOMAIN_NAME}
+iniset ${KINGBIRD_CONF_FILE} keystone_authtoken user_domain_name ${OS_USER_DOMAIN_NAME}
 
 # Configure the database.
 iniset ${KINGBIRD_CONF_FILE} database connection "mysql://$mysql_user:$mysql_pass@$mysql_host/$mysql_db?charset=utf8"
