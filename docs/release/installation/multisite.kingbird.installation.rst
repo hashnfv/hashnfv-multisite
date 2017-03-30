@@ -8,16 +8,15 @@ Kingbird installation instruction
 Abstract
 --------
 This document will give the user instructions on how to deploy
-available scenarios verified for the Colorado release of OPNFV
+available scenarios verified for the Danube release of OPNFV
 platform.
 
 
 Preparing the installation
 --------------------------
 Kingbird is centralized synchronization service for multi-region OpenStack
-deployments. In OPNFV Colorado release, Kingbird provides centralized quota
-management feature. At least two OpenStack regions with shared KeyStone should
-be installed first.
+deployments. Kingbird provides centralized quota management feature. At least
+two OpenStack regions with shared KeyStone should be installed first.
 
 Kingbird includes kingbird-api and kingbird-engine, kingbird-api and
 kingbird-engine which talk to each other through message bus, and both
